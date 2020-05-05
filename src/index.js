@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs')
 const https = require('https')
-//const http = require('http')
+const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
@@ -12,7 +12,7 @@ const httpsOptions = {
     cert: fs.readFileSync(path.join(__dirname,'ssl','server.cert')),
     key: fs.readFileSync(path.join(__dirname,'ssl','server.key'))
 }
-const server = https.createServer(httpsOptions, app)
+const server = http.createServer(app)
 const io = socketio(server)
 
 const port = process.env.PORT || 3000;
