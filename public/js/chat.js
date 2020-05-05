@@ -24,7 +24,7 @@ const { username, room } = Qs.parse(location.search, {
 let mediaSources = []
 let sourceBuffers = []
 let objectUrls = []
-const interval  = 100
+const interval  = 1000
 let streamFlag = false
 let isFirstCon = true
 let selfId = null
@@ -150,7 +150,7 @@ socket.emit("join", { username, room }, (error)=>{
     mediaSource.mediaSource.addEventListener('sourceopen', function(){
     this.addSourceBuffer("video/webm; codecs=\"opus,vp8\"")
     this.sourceBuffers[0].mode = 'sequence'
-    console.log( this.sourceBuffers[0].mode)
+    //console.log( this.sourceBuffers[0].mode)
     this.sourceBuffers[0].appendWindowStart = 0;
     
     //console.log('end',this.sourceBuffers[0].appendWindowEnd)
@@ -187,7 +187,6 @@ socket.emit("join", { username, room }, (error)=>{
 
 const streamUpdater = async()=>{
   setInterval(()=>{
-    console.log()
     mediaSources.forEach((mediaSource)=>{appendToSourceBuffer(mediaSource)})
     //appendToSourceBuffer(mediaSources[0].mediaSource)
   },interval) 
@@ -217,7 +216,6 @@ const appendToSourceBuffer = async (mediaSrc,blob)=>{
       try{
         if(blob){
           const video = document.getElementById(id)
-          console.log( sourceBuffer.mode)
           sourceBuffer.appendBuffer(blob);
         }
       }
