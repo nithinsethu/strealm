@@ -12,7 +12,7 @@ const httpsOptions = {
     cert: fs.readFileSync(path.join(__dirname,'ssl','server.cert')),
     key: fs.readFileSync(path.join(__dirname,'ssl','server.key'))
 }
-const server = http.createServer(app)
+const server = https.createServer(httpsOptions,app)
 const io = socketio(server)
 
 const port = process.env.PORT || 80;
