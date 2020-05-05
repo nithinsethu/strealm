@@ -1,21 +1,21 @@
 const path = require('path');
 const fs = require('fs')
 const https = require('https')
+//const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 const { addStream, getStream, updateStream, getBlob, getStreamsInRoom } = require('./utils/streams')
 const app = express();
-var keys_dir = './sslcert/';
-var serverOptions = { 
-  key  : fs.readFileSync(keys_dir + 'server.key'),
-  cert : fs.readFileSync(keys_dir + 'server.crt') 
+const httpsOptions = {
+    cert: fs.readFileSync(path.join(__dirname,'ssl','server.cert')),
+    key: fs.readFileSync(path.join(__dirname,'ssl','server.key'))
 }
-const server = https.createServer(erverOptions, app)
+const server = https.createServer(httpsOptions, app)
 const io = socketio(server)
 
-const port = process.env.PORT || 3443;
+const port = process.env.PORT || 3000;
 let index = 0
 let lastReload = new Date().getTime()
 
