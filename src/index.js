@@ -15,7 +15,7 @@ const httpsOptions = {
 const server = https.createServer(httpsOptions,app)
 const io = socketio(server)
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 443;
 let index = 0
 let lastReload = new Date().getTime()
 
@@ -36,10 +36,10 @@ io.on('connection', (socket)=>{
         if(error){
             return callback(error)
         }
-        if(new Date().getTime() - lastReload >=1000){
-            io.to(user.room).emit('reload')
-            lastReload = new Date().getTime()
-        }
+        // if(new Date().getTime() - lastReload >=1000){
+        //     io.to(user.room).emit('reload')
+        //     lastReload = new Date().getTime()
+        // }
         socket.join(user.room);
         socket.emit('message', generateMessage('','Welcome!'));
         socket.broadcast.to(user.room).emit('message', generateMessage('',`${user.username} has joined`));
@@ -49,6 +49,7 @@ io.on('connection', (socket)=>{
             id:socket.id,
             message:'add'
         })
+        //socket.broadcast.to(user.room).emit('reload')
         callback()
     })
 

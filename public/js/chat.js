@@ -24,11 +24,13 @@ const { username, room } = Qs.parse(location.search, {
 let mediaSources = []
 let sourceBuffers = []
 let objectUrls = []
-const interval  = 100
+const interval  = 1000
 let streamFlag = false
 let isFirstCon = true
 let selfId = null
 let selfMediaSource = null
+let mediaRecorder = null
+let stream = null
 // socket.on("message", (message) => {
 //   const html = Mustache.render(messageTemplate, {
 //     username: message.username,
@@ -47,7 +49,7 @@ let selfMediaSource = null
 //   });
 //   $messages.insertAdjacentHTML("beforeend", html);
 // });
-socket.on('reload',()=>location.reload())
+socket.on('reload',async ()=>restartRecorder())
 socket.on('roomData', ({room, users,id,message})=>{
   const html = Mustache.render(sidebarTemplate, {room, users})
   document.querySelector('#sidebar').innerHTML = html;
@@ -58,6 +60,10 @@ socket.on('roomData', ({room, users,id,message})=>{
   }
   else{
     updateMediaSources(id,message);
+    restartRecorder()
+    // restartRecorder()
+    // restartRecorder()
+    
   }
 })
 
@@ -109,16 +115,28 @@ socket.emit("join", { username, room }, (error)=>{
 
 });
 
+const restartRecorder = async ()=>{
+      await mediaRecorder.stop()
+      startRecorder()
+      console.log('Restarting recorder')
+}
 
+const startRecorder= async ()=>{
+    const options = { mimeType: "video/webm; codecs=\"opus,vp8\"", bitsPerSecond: 1000 };
+    mediaRecorder = new MediaRecorder(stream, options);
+    mediaRecorder.ondataavailable = handleData;
+    mediaRecorder.start(interval);
+    // setInterval(()=>{
+    //   restartRecorder()
+    // },1000)
+    
+}
   constraints = { audio: true, video: true};
   navigator.mediaDevices
   .getUserMedia(constraints)
-  .then((stream) => {
-    const options = { mimeType: "video/webm; codecs=\"opus,vp8\"" };
-    const mediaRecorder = new MediaRecorder(stream, options);
-
-    mediaRecorder.ondataavailable = handleData;
-    mediaRecorder.start(interval);
+  .then((_) => {
+    stream = _
+    startRecorder()
     
     // setInterval(() => {
     //    mediaRecorder.requestData();
@@ -133,9 +151,11 @@ socket.emit("join", { username, room }, (error)=>{
   const handleData = async (event) => {
     if (event.data) {
       const blob = event.data
-      const ab = await blob.arrayBuffer()
-      appendToSourceBuffer(selfMediaSource,ab)
       socket.emit('sendStream',blob)
+      const ab = await blob.arrayBuffer()
+      //console.log(ab)
+      appendToSourceBuffer(selfMediaSource,ab)
+      
     }
   };
 
@@ -223,8 +243,8 @@ const appendToSourceBuffer = async (mediaSrc,blob)=>{
     
   }
   else{
-    //mediaSource.addSourceBuffer("video/webm; codecs=\"opus,vp8\"")
-    //console.log(mediaSource.readyState,blob)
+    console.log('stopped')
+    location.reload()
   }
   //const video = document.querySelector('#'+selfId)
 //   if (
