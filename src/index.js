@@ -89,10 +89,10 @@ io.on('connection', (socket)=>{
         if(stream){
             // console.log(getStreamsInRoom(socket.room))
             //updateStream(socket.id,blob)
-            return io.to(stream.room).emit('blob',{id:socket.id, blob})
+            return socket.broadcast.to(stream.room).emit('blob',{id:socket.id, blob})
         }
         addStream({id:socket.id, room:socket.room ,blobs:[blob]})
-        io.to(socket.room).emit('blob',{id:socket.id, blob})
+        socket.broadcast.to(socket.room).emit('blob',{id:socket.id, blob})
         
         //console.log(addStream({id:socket.id, mediaElement}))
         //io.emit('streamData',getStream(socket.id))

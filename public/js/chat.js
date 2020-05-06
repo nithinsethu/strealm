@@ -28,7 +28,7 @@ const interval  = 100
 let streamFlag = false
 let isFirstCon = true
 let selfId = null
-
+let selfMediaSource = null
 // socket.on("message", (message) => {
 //   const html = Mustache.render(messageTemplate, {
 //     username: message.username,
@@ -133,7 +133,8 @@ socket.emit("join", { username, room }, (error)=>{
   const handleData = async (event) => {
     if (event.data) {
       const blob = event.data
-      //console.log('Sending blob!',blob)
+      const ab = await blob.arrayBuffer()
+      appendToSourceBuffer(selfMediaSource,ab)
       socket.emit('sendStream',blob)
     }
   };
@@ -160,15 +161,10 @@ socket.emit("join", { username, room }, (error)=>{
     mediaSources.push(mediaSource)
     const html = Mustache.render(streamTemplate,mediaSource)
     $streams.insertAdjacentHTML("beforeend", html);
-    if(id === selfId)
+    if(id === selfId){
       document.getElementById(selfId).muted = true
-    if(!streamFlag){
-      //document.querySelector('#'+selfId).muted = true
-     
-      streamFlag = true
-      //streamUpdater()
+      selfMediaSource = mediaSource
     }
-    //console.log(mediaSources)
     
   }
   else{
