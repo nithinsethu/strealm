@@ -53,7 +53,7 @@ socket.on("roomData", ({ room, users, id, message,username }) => {
     restartRecorder();
     updateMediaSources(id, message, username);
     //restartRecorder();	  
-    $video.currentTime = $video.buffered.end(0)
+    //$video.currentTime = $video.buffered.end(0)
     
   }
 });
@@ -174,6 +174,10 @@ const updateMediaSources = (id, message, username) => {
     mediaSources.push(mediaSource);
     const html = Mustache.render(streamTemplate, mediaSource);
     $streams.insertAdjacentHTML("beforeend", html);
+	const temp = document.getElementById(id)
+	  temp.onloadedmetadata = function (){
+      this.play()
+    }
     if (id === selfId) {
       $video = document.getElementById(selfId)
       $video.muted = true;
@@ -186,7 +190,7 @@ const updateMediaSources = (id, message, username) => {
     mediaSources.splice(index, 1);
     const videoElement = document.getElementById(id);
     if (videoElement) {
-      videoElement.pause();
+      //videoElement.pause();
       videoElement.parentElement.remove();
     }
   }
