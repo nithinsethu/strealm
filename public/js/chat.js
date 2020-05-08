@@ -8,6 +8,7 @@ const $messages = document.querySelector("#messages");
 const $streams = document.querySelector("#streams");
 const $temp = document.querySelector("#compose");
 $temp.style.display = "none";
+let $video = null
 
 //Templates
 const messageTemplate = document.querySelector("#message-template").innerHTML;
@@ -33,21 +34,26 @@ let selfId = null;
 let selfMediaSource = null;
 let mediaRecorder = null;
 let stream = null;
+let ctime = null;
 
 
 socket.on("reload", async () => restartRecorder());
 
 
-socket.on("roomData", ({ room, users, id, message }) => {
+socket.on("roomData", ({ room, users, id, message,username }) => {
   const html = Mustache.render(sidebarTemplate, { room, users });
   document.querySelector("#sidebar").innerHTML = html;
   if (isFirstCon) {
     selfId = id;
-    users.forEach((user) => updateMediaSources(user.id, "add"));
+    users.forEach((user) => updateMediaSources(user.id,"add",username));
     isFirstCon = false;
   } else {
-    updateMediaSources(id, message);
     restartRecorder();
+    // $video.currentTime = parseInt((new Date().getTime - ctime)/1000)
+    ctime = new Date().getTime
+    updateMediaSources(id, message, username);
+    $video.currentTime = $video.buffered.end(0)
+    
   }
 });
 
@@ -110,7 +116,7 @@ const restartRecorder = async () => {
 const startRecorder = async () => {
   const options = {
     mimeType: 'video/webm; codecs="opus,vp8"',
-    bitsPerSecond: 1000,
+    bitsPerSecond: 3000,
   };
   mediaRecorder = new MediaRecorder(stream, options);
   mediaRecorder.ondataavailable = handleData;
@@ -123,6 +129,14 @@ navigator.mediaDevices
   .then((_) => {
     stream = _;
     startRecorder();
+    // setInterval(()=>{
+      
+    //   if($video.buffered.end(0) - $video.currentTime>2){
+    //     console.log($video.buffered.end(0), $video.currentTime)
+    //     $video.currentTime = $video.buffered.end(0)-0.1
+    //   }
+        
+    // },1000)
   })
   .catch((err) => {});
 
@@ -132,25 +146,36 @@ const handleData = async (event) => {
     const blob = event.data;
     socket.emit("sendStream", blob);
     const ab = await blob.arrayBuffer();
+    if(!ctime){
+      ctime = new Date().getTime()
+    }
     appendToSourceBuffer(selfMediaSource, ab);
   }
 };
 
-const updateMediaSources = (id, message) => {
+const updateMediaSources = (id, message, username) => {
   if (message === "add") {
-    const mediaSource = { id, mediaSource: new MediaSource() };
+    const mediaSource = { id, mediaSource: new MediaSource()};
+    if(id===selfId){
+      mediaSource.username = 'You'
+    }
+    else{
+      mediaSource.username = username
+    }
+
     mediaSource.url = URL.createObjectURL(mediaSource.mediaSource);
     mediaSource.mediaSource.addEventListener("sourceopen", function () {
       this.addSourceBuffer('video/webm; codecs="opus,vp8"');
       this.sourceBuffers[0].mode = "sequence";
       this.sourceBuffers[0].appendWindowStart = 0;
-      this.addEventListener("updateend", appendToSourceBuffer);
+      //this.addEventListener("updateend", appendToSourceBuffer);
     });
     mediaSources.push(mediaSource);
     const html = Mustache.render(streamTemplate, mediaSource);
     $streams.insertAdjacentHTML("beforeend", html);
     if (id === selfId) {
-      document.getElementById(selfId).muted = true;
+      $video = document.getElementById(selfId)
+      $video.muted = true;
       selfMediaSource = mediaSource;
     }
   } else {
@@ -177,7 +202,7 @@ const appendToSourceBuffer = async (mediaSrc, blob) => {
   if (cond) {
     try {
       if (blob) {
-        const video = document.getElementById(id);
+        
         sourceBuffer.appendBuffer(blob);
       }
     } catch (e) {
@@ -188,6 +213,23 @@ const appendToSourceBuffer = async (mediaSrc, blob) => {
     socket.emit("dr", () => {});
     location = location;
   }
+  const video = document.getElementById(id);
+  try{
+    end = video.buffered.end(0)
+    if( end-video.currentTime>2){
+        console.log('Oh twaddi!') 
+        video.currentTime = video.buffered.end(0)
+      }
+  }
+  catch(e){
+
+  }
+  
+  // video.buffered.end(0).then((end)=>{).catch(()=>{
+    
+  // })
+  
+  
   //const video = document.querySelector('#'+selfId)
   //   if (
   //     video.buffered.length &&

@@ -43,7 +43,8 @@ io.on('connection', (socket)=>{
             room: user.room,
             users: getUsersInRoom(user.room),
             id:socket.id,
-            message:'add'
+            message:'add',
+            username: user.username
         })
         callback()
     })

@@ -18,7 +18,7 @@
         </ul>
         </div>
 
-        <div class="compose">
+        <div id="compose" class="compose">
           <form id="message-form">
             <input type="text" name="message" placeholder="message" autocomplete="off"/>
             <button>Send</button>
@@ -67,7 +67,10 @@
       </ul>
     </script> -->
     <script id="stream-template" type="text/html">
-      <li class="stream-list" ><video width="300" height="300" id={{id}} src={{url}}  autoplay></video></li>
+      <li class="stream-list" >
+        <p>{{username}}</p>
+        <video width="300" height="300" id={{id}} src={{url}}  autoplay></video>
+      </li>
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
