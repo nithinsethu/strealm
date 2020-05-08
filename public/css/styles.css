@@ -191,3 +191,9 @@ button:disabled {
     display: inline-block;
     vertical-align: top;
 }
+
+.streams {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+  }

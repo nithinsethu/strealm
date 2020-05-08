@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat App</title>
+    <title>Strealm</title>
     <link rel="icon" href="/img/favicon.png" />
     <link rel="stylesheet" href="/css/styles.css" />
   </head>
@@ -13,9 +13,9 @@
         
       </div>
       <div class="chat__main">
-        <div id="messages" class="chat__messages"></div>
-        <ul class="streams" id="streams">
+	  <ul class="streams" id="streams">
         </ul>
+        <div id="messages" class="chat__messages"></div>
         </div>
 
         <div id="compose" class="compose">
@@ -68,8 +68,8 @@
     </script> -->
     <script id="stream-template" type="text/html">
       <li class="stream-list" >
-        <p>{{username}}</p>
-        <video width="300" height="300" id={{id}} src={{url}}  autoplay></video>
+	<p><b>{{username}}</b></p>
+        <video width="350" height="350" id={{id}} src={{url}}  autoplay></video>
       </li>
     </script>
 

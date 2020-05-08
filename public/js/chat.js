@@ -27,7 +27,7 @@ const { username, room } = Qs.parse(location.search, {
 let mediaSources = [];
 let sourceBuffers = [];
 let objectUrls = [];
-const interval = 1000;
+const interval = 800;
 let streamFlag = false;
 let isFirstCon = true;
 let selfId = null;
@@ -45,13 +45,14 @@ socket.on("roomData", ({ room, users, id, message,username }) => {
   document.querySelector("#sidebar").innerHTML = html;
   if (isFirstCon) {
     selfId = id;
-    users.forEach((user) => updateMediaSources(user.id,"add",username));
+    users.forEach((user) => updateMediaSources(user.id,"add",user.username));
     isFirstCon = false;
   } else {
-    restartRecorder();
     // $video.currentTime = parseInt((new Date().getTime - ctime)/1000)
     ctime = new Date().getTime
+    restartRecorder();
     updateMediaSources(id, message, username);
+    //restartRecorder();	  
     $video.currentTime = $video.buffered.end(0)
     
   }
@@ -217,7 +218,6 @@ const appendToSourceBuffer = async (mediaSrc, blob) => {
   try{
     end = video.buffered.end(0)
     if( end-video.currentTime>2){
-        console.log('Oh twaddi!') 
         video.currentTime = video.buffered.end(0)
       }
   }
