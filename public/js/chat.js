@@ -6,6 +6,8 @@ const $messageFormButton = $messageForm.querySelector("button");
 const $sendLocationButton = document.querySelector("#send-location");
 const $messages = document.querySelector("#messages");
 const $streams = document.querySelector("#streams");
+const $toggleAudio  = document.querySelector('#toggle-audio')
+const $toggleVideo  = document.querySelector('#toggle-video')
 const $temp = document.querySelector("#compose");
 $temp.style.display = "none";
 let $video = null
@@ -35,6 +37,35 @@ let selfMediaSource = null;
 let mediaRecorder = null;
 let stream = null;
 let ctime = null;
+
+
+const toggleAudio = async (event)=>{
+  const t = stream.getAudioTracks()[0].enabled
+  if(t){
+    $toggleAudio.textContent = 'Unmute Microphone'
+  }
+  else{
+    $toggleAudio.textContent = 'Mute Microphone'
+  }
+  stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled
+  await $video.play()
+}
+
+
+const toggleVideo = async (event)=>{
+  const t = stream.getVideoTracks()[0].enabled
+  if(t){
+    $toggleVideo.textContent = 'Enable Webcam'
+  }
+  else{
+    $toggleVideo.textContent = 'Disable Webcam'
+  }
+  stream.getVideoTracks()[0].enabled = !stream.getVideoTracks()[0].enabled
+  await $video.play()
+}
+
+$toggleAudio.onclick = toggleAudio;
+$toggleVideo.onclick = toggleVideo;
 
 
 socket.on("reload", async () => restartRecorder());
